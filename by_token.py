@@ -1,11 +1,11 @@
 from sentinelsat import SentinelAPI
 from datetime import datetime
 
-user = 'Martin Kelko'
-password = 'Nepijemrum22_22'
+# Replace 'your_api_token' with your actual API token
+api_token = 'your_api_token'
 
-# Connect to the Copernicus API
-api = SentinelAPI(user, password, 'https://apihub.copernicus.eu/apihub', timeout=60)
+# Connect to the Copernicus API using API token
+api = SentinelAPI(api_token, 'https://apihub.copernicus.eu/apihub', timeout=60)
 
 # Extract coordinates and time range from the JSON data
 data = [

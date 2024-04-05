@@ -5,10 +5,10 @@ from datetime import datetime
 # Client secret (Zo0CLOiTnMVSa7QfG8bdQKKqnFfskrL1)
 
 # Replace 'your_api_token' with your actual API token
-api_token = 'your_api_token'
+api_token = 'Zo0CLOiTnMVSa7QfG8bdQKKqnFfskrL1'
 
 # Connect to the Copernicus API using API token
-api = SentinelAPI(api_token, 'https://apihub.copernicus.eu/apihub', timeout=60)
+api = SentinelAPI(api_token, 'https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token', timeout=60)
 
 # Extract coordinates and time range from the JSON data
 data = [

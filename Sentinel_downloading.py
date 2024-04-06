@@ -7,7 +7,8 @@ from shapely.geometry import shape
 
 copernicus_user = "martin2kelko@gmail.com" # copernicus User
 copernicus_password = "Nepijemrum22_22" # copernicus Password
-ft = "LINESTRING (18.378160470578962 48.93531570012354, 19.25354062765919 48.95389112187124, 19.269879679349344 48.74267295558218, 18.36424446604272 48.72542958357761, 18.37033165553393 48.93531004676146)"  # AOI = get coordinates by drawing polygon in geojson.io, download as .wkt file, open the file and copy+paste here
+# AOI = get coordinates by drawing polygon in Copernicus Browser, copy+paste in geojson.io, download as .wkt file, open the file and copy+paste here
+ft = "POLYGON ((-72.079582 -39.533174, -72.079582 -39.331907, -71.760635 -39.331907, -71.760635 -39.533174, -72.079582 -39.533174))"
 data_collection = "SENTINEL-2" # Sentinel type
 
 # date range
@@ -67,7 +68,7 @@ try:
 
                     # download directory here
                     with open(
-                            f"C:/Users/marti/PycharmProjects/sentinelhub_API_volcanoes_satimages/{feat['properties']['identifier']}.zip",
+                            f"C:/Users/marti/PycharmProjects/sentinelhub_API_volcanoes_satimages/sentinelhub_API_downloads/{feat['properties']['identifier']}.zip",
                             "wb",
                     ) as p:
                         print(feat["properties"]["Name"])

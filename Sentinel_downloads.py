@@ -20,9 +20,8 @@ today_string = today.strftime("%Y-%m-%d")
 yesterday = today - timedelta(days=2)
 yesterday_string = yesterday.strftime("%Y-%m-%d")
 
-
+# Copernicus Browser API Token
 def get_keycloak_token(username: str, password: str) -> str:
-    """Function to retrieve a Keycloak access token."""
     data = {
         "client_id": "cdse-public",
         "username": username,
@@ -87,7 +86,7 @@ try:
                 identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
 
                 # Download directory here
-                download_directory = "C:/Users/marti/PycharmProjects/sentinelhub_API_volcanoes_satimages/sentinelhub_API_downloads/"
+                download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L2A_downloads"
                 os.makedirs(download_directory, exist_ok=True)
                 file_path = os.path.join(download_directory,
                                          f"{identifier}.zip")

@@ -42,7 +42,7 @@ def query_and_download_products():
         # Date range
         today = date.today()
         today_string = today.strftime("%Y-%m-%d")
-        yesterday = today - timedelta(days=1)
+        yesterday = today - timedelta(days=2)
         yesterday_string = yesterday.strftime("%Y-%m-%d")
 
         # Query the Copernicus catalogue for matching products
@@ -59,10 +59,7 @@ def query_and_download_products():
         products = pd.DataFrame.from_dict(json_data["value"])
 
         if not products.empty:
-            # Filter out L1C datasets
-            products = products[~products["Name"].str.contains("L1C")]
-
-            print(f"Total L2A tiles found: {len(products)}")
+            print(f"Total products found: {len(products)}")
 
             for idx, product in products.iterrows():
                 try:
@@ -89,11 +86,16 @@ def query_and_download_products():
                     # Truncate or modify the identifier if needed to fit within file name limits
                     identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
 
-                    # Download directory
-                    download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L2A_downloads"
+                    # Determine if Level-1C or Level-2A
+                    if "L1C" in product_name:
+                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L1C_downloads"
+                    elif "L2A" in product_name:
+                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L2A_downloads"
+                    else:
+                        continue  # Skip if neither L1C nor L2A
+
                     os.makedirs(download_directory, exist_ok=True)
-                    file_path = os.path.join(download_directory,
-                                             f"{identifier}.zip")
+                    file_path = os.path.join(download_directory, f"{identifier}.zip")
 
                     # Save the downloaded file
                     with open(file_path, "wb") as file:
@@ -103,7 +105,7 @@ def query_and_download_products():
                     print(f"Error downloading {product_name}: {e}")
 
         else:
-            print("No L2A tiles found for requiring date range")
+            print("No products found for the required date range")
 
     except Exception as e:
         print(f"Error in downloading products: {e}")
@@ -118,7 +120,7 @@ print("Automate test complete.")
 # Open Win11 Task Scheduler -> click on "Create Basic Task" -> set the
 # trigger to be "Daily" and specify the time -> choose to start a program and
 # provide the path to your Python executable (python.exe) and the script (
-# Villarrica_2L2A.py)
+# Villarrica_S2_1C_2A.py)
 schedule.every().day.at("04:30").do(query_and_download_products)
 
 # Infinite loop to run the scheduler

@@ -67,14 +67,6 @@ def download_nir_composite(product_name: str, response: requests.Response,
     # Truncate or modify the identifier if needed to fit within file name limits
     identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
 
-    # Determine NIR composite bands based on product type
-    if "L1C" in product_name:
-        bands = ["B08", "B04", "B03"]  # NIR composite bands for L1C
-    elif "L2A" in product_name:
-        bands = ["B12", "B11", "B04"]  # NIR composite bands for L2A
-    else:
-        return  # Skip if neither L1C nor L2A
-
     # Save the downloaded NIR composite file
     file_path = os.path.join(download_directory, f"{identifier}_NIR.zip")
     with open(file_path, "wb") as file:
@@ -84,12 +76,10 @@ def download_nir_composite(product_name: str, response: requests.Response,
 # Copernicus Browser catalogue and download products
 def query_and_download_products():
     try:
-        # Villarrica coordinates = get coordinates by drawing polygon in
-        # Copernicus Browser, copy+paste
-        # coordinates in geojson.io, download as .wkt file, open the .wkt file and copy+paste text here
+        # Villarrica coordinates - specify the polygon of interest
         ft = "POLYGON ((-72.079582 -39.533174, -72.079582 -39.331907, -71.760635 -39.331907, -71.760635 -39.533174, -72.079582 -39.533174))"
 
-        # Date range
+        # Date range for querying products
         today = date.today()
         today_string = today.strftime("%Y-%m-%d")
         yesterday = today - timedelta(days=2)
@@ -118,10 +108,8 @@ def query_and_download_products():
             for idx, product in products.iterrows():
                 try:
                     session = requests.Session()
-                    keycloak_token = get_keycloak_token(copernicus_user,
-                                                        copernicus_password)
-                    session.headers.update(
-                        {"Authorization": f"Bearer {keycloak_token}"})
+                    keycloak_token = get_keycloak_token(copernicus_user, copernicus_password)
+                    session.headers.update({"Authorization": f"Bearer {keycloak_token}"})
 
                     product_id = product["Id"]
                     product_name = product["Name"]
@@ -139,17 +127,14 @@ def query_and_download_products():
                     if "L1C" in product_name:
                         download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L1C_downloads"
                         os.makedirs(download_directory, exist_ok=True)
-                        download_level1c(product_name, response,
-                                         download_directory)
+                        download_level1c(product_name, response, download_directory)
                     elif "L2A" in product_name:
                         download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L2A_downloads"
                         os.makedirs(download_directory, exist_ok=True)
-                        download_level2a(product_name, response,
-                                         download_directory)
+                        download_level2a(product_name, response, download_directory)
 
                     # Download the NIR composite using the specified directory
-                    download_nir_composite(product_name, response,
-                                           nir_download_directory)
+                    download_nir_composite(product_name, response, nir_download_directory)
 
                 except Exception as e:
                     print(f"Error downloading {product_name}: {e}")
@@ -166,7 +151,7 @@ print("Automatically starting the script...")
 query_and_download_products()
 print("Automate test complete.")
 
-# Scheduling the script every day at 4:30 AM
+# Scheduling the script to run every day at 4:30 AM
 schedule.every().day.at("04:30").do(query_and_download_products)
 
 # Infinite loop to run the scheduler

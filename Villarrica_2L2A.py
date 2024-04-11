@@ -34,7 +34,8 @@ def get_keycloak_token(username: str, password: str) -> str:
 # Copernicus Browser catalogue and download products
 def query_and_download_products():
     try:
-        # AOI = get coordinates by drawing polygon in Copernicus Browser, copy+paste
+        # Villarrica coordinates = get coordinates by drawing polygon in
+        # Copernicus Browser, copy+paste
         # coordinates in geojson.io, download as .wkt file, open the .wkt file and copy+paste text here
         ft = "POLYGON ((-72.079582 -39.533174, -72.079582 -39.331907, -71.760635 -39.331907, -71.760635 -39.533174, -72.079582 -39.533174))"
 
@@ -117,7 +118,7 @@ print("Automate test complete.")
 # Open Win11 Task Scheduler -> click on "Create Basic Task" -> set the
 # trigger to be "Daily" and specify the time -> choose to start a program and
 # provide the path to your Python executable (python.exe) and the script (
-# Sentinel-2L2A.py)
+# Villarrica_2L2A.py)
 schedule.every().day.at("04:30").do(query_and_download_products)
 
 # Infinite loop to run the scheduler

@@ -42,7 +42,7 @@ def query_and_download_products():
         # Date range
         today = date.today()
         today_string = today.strftime("%Y-%m-%d")
-        yesterday = today - timedelta(days=2)
+        yesterday = today - timedelta(days=3)
         yesterday_string = yesterday.strftime("%Y-%m-%d")
 
         # Query the Copernicus catalogue for matching products

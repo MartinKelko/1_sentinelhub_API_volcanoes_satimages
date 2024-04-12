@@ -5,14 +5,15 @@ import pandas as pd
 import requests
 import schedule
 import time
+from PIL import Image
+import zipfile
 
 # Copernicus User
 copernicus_user = "martin2kelko@gmail.com"
 # Copernicus Password
 copernicus_password = "Nepijemrum22_22"
 
-
-# Copernicus Browser API Token
+# Function to retrieve Keycloak token for Copernicus API access
 def get_keycloak_token(username: str, password: str) -> str:
     data = {
         "client_id": "cdse-public",
@@ -30,51 +31,45 @@ def get_keycloak_token(username: str, password: str) -> str:
     except Exception as e:
         raise Exception(f"Keycloak token retrieval failed. Error: {e}")
 
+# Function to generate false color composite image using specific bands
+def generate_false_color_composite(product_name: str, download_directory: str, output_directory: str, band_paths: list):
+    try:
+        identifier = product_name.split("_")[0]
+        identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
 
-# Function to download Level-1C product
-def download_level1c(product_name: str, response: requests.Response,
-                     download_directory: str):
-    # Extract the identifier from the product name
-    identifier = product_name.split("_")[0]
-    # Truncate or modify the identifier if needed to fit within file name limits
-    identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
+        with zipfile.ZipFile(os.path.join(download_directory, f"{identifier}.zip"), 'r') as zip_ref:
+            bands = ["B12", "B11", "B04"]  # Bands to use for false color composite
+            composite_image = [None] * len(bands)
 
-    # Save the downloaded Level-1C product
-    file_path = os.path.join(download_directory, f"{identifier}_L1C.zip")
-    with open(file_path, "wb") as file:
-        file.write(response.content)
+            for band_path in band_paths:
+                for i, band in enumerate(bands):
+                    filename = f"{identifier}_{band}_10m.jp2"
+                    path_in_zip = os.path.join(*band_path[:-1], filename)
 
+                    if path_in_zip in zip_ref.namelist():
+                        with zip_ref.open(path_in_zip) as file:
+                            image = Image.open(file)
+                            composite_image[i] = image.split()[0]
+                    else:
+                        print(f"File {filename} not found in the archive for product {product_name}")
 
-# Function to download Level-2A product
-def download_level2a(product_name: str, response: requests.Response,
-                     download_directory: str):
-    # Extract the identifier from the product name
-    identifier = product_name.split("_")[0]
-    # Truncate or modify the identifier if needed to fit within file name limits
-    identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
+            if all(composite_image):
+                # Merge bands into RGB channels (B12 -> R, B11 -> G, B04 -> B)
+                composite_image = Image.merge("RGB", (composite_image[0], composite_image[1], composite_image[2]))
 
-    # Save the downloaded Level-2A product
-    file_path = os.path.join(download_directory, f"{identifier}_L2A.zip")
-    with open(file_path, "wb") as file:
-        file.write(response.content)
+                # Save the false color composite image
+                file_path = os.path.join(output_directory, f"{identifier}_FalseColor.jpg")
+                composite_image.save(file_path)
+                print(f"False color composite generated for {product_name}")
+            else:
+                print(f"Unable to generate false color composite for {product_name}: Insufficient band data")
 
-
-# Function to download NIR composite image
-def download_nir_composite(product_name: str, response: requests.Response,
-                           download_directory: str):
-    # Extract the identifier from the product name
-    identifier = product_name.split("_")[0]
-    # Truncate or modify the identifier if needed to fit within file name limits
-    identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
-
-    # Save the downloaded NIR composite file
-    file_path = os.path.join(download_directory, f"{identifier}_NIR.zip")
-    with open(file_path, "wb") as file:
-        file.write(response.content)
+    except Exception as e:
+        print(f"Error generating false color composite for {product_name}: {e}")
 
 
-# Copernicus Browser catalogue and download products
-def query_and_download_products():
+# Function to query Copernicus catalogue and generate false color composites
+def query_and_generate_false_color_composites():
     try:
         # Villarrica coordinates - specify the polygon of interest
         ft = "POLYGON ((-72.079582 -39.533174, -72.079582 -39.331907, -71.760635 -39.331907, -71.760635 -39.533174, -72.079582 -39.533174))"
@@ -82,7 +77,7 @@ def query_and_download_products():
         # Date range for querying products
         today = date.today()
         today_string = today.strftime("%Y-%m-%d")
-        yesterday = today - timedelta(days=2)
+        yesterday = today - timedelta(days=3)
         yesterday_string = yesterday.strftime("%Y-%m-%d")
 
         # Query the Copernicus catalogue for matching products
@@ -101,9 +96,11 @@ def query_and_download_products():
         if not products.empty:
             print(f"Total products found: {len(products)}")
 
-            # Specify the download directory for NIR composite
-            nir_download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-NIR_downloads"
-            os.makedirs(nir_download_directory, exist_ok=True)
+            download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-NIR_downloads"
+            output_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-FalseColor_images"
+
+            os.makedirs(download_directory, exist_ok=True)
+            os.makedirs(output_directory, exist_ok=True)
 
             for idx, product in products.iterrows():
                 try:
@@ -123,36 +120,35 @@ def query_and_download_products():
 
                     print(f"Downloading: {product_name}")
 
-                    # Determine download directory based on product type
-                    if "L1C" in product_name:
-                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L1C_downloads"
-                        os.makedirs(download_directory, exist_ok=True)
-                        download_level1c(product_name, response, download_directory)
-                    elif "L2A" in product_name:
-                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Sentinel-2L2A_downloads"
-                        os.makedirs(download_directory, exist_ok=True)
-                        download_level2a(product_name, response, download_directory)
+                    identifier = product_name.split("_")[0]
+                    identifier = re.sub(r'[^a-zA-Z0-9-_]', '', identifier)[:50]
+                    file_path = os.path.join(download_directory, f"{identifier}.zip")
 
-                    # Download the NIR composite using the specified directory
-                    download_nir_composite(product_name, response, nir_download_directory)
+                    with open(file_path, "wb") as file:
+                        file.write(response.content)
+
+                    # Extract band paths from product name
+                    band_paths = [re.split(r'\\|/', path) for path in product_name.split(",")]
+
+                    print(f"Generating false color composite for: {product_name}")
+                    generate_false_color_composite(product_name, download_directory, output_directory, band_paths)
 
                 except Exception as e:
-                    print(f"Error downloading {product_name}: {e}")
+                    print(f"Error processing {product_name}: {e}")
 
         else:
             print("No products found for the required date range")
 
     except Exception as e:
-        print(f"Error in downloading products: {e}")
-
+        print(f"Error in querying and processing products: {e}")
 
 # Automate test the function outside of scheduling
 print("Automatically starting the script...")
-query_and_download_products()
+query_and_generate_false_color_composites()
 print("Automate test complete.")
 
-# Scheduling the script to run every day at 4:30 AM
-schedule.every().day.at("04:30").do(query_and_download_products)
+# Scheduling the script every day at 4:30 AM
+schedule.every().day.at("04:30").do(query_and_generate_false_color_composites)
 
 # Infinite loop to run the scheduler
 print("Scheduled job started. Waiting for execution...")

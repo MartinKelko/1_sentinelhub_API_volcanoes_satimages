@@ -121,7 +121,7 @@ print("Automate test complete.")
 # trigger to be "Daily" and specify the time -> choose to start a program and
 # provide the path to your Python executable (python.exe) and the script (
 # Villarrica_S2_1C_2A.py)
-schedule.every().day.at("04:30").do(query_and_download_products)
+schedule.every().day.at("04:25").do(query_and_download_products)
 
 # Infinite loop to run the scheduler
 print("Scheduled job started. Waiting for execution...")

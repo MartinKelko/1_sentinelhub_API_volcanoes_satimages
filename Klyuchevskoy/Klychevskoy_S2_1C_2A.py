@@ -30,7 +30,6 @@ def get_keycloak_token(username: str, password: str) -> str:
     except Exception as e:
         raise Exception(f"Keycloak token retrieval failed. Error: {e}")
 
-
 # Copernicus Browser catalogue and download products
 def query_and_download_products():
     try:

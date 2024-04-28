@@ -30,10 +30,17 @@ def get_keycloak_token(username: str, password: str) -> str:
     except Exception as e:
         raise Exception(f"Keycloak token retrieval failed. Error: {e}")
 
-
 # Copernicus Browser catalogue and download products
 def query_and_download_products():
     try:
+        # Fetching credentials from environment variables
+        copernicus_user = os.environ.get("COPERNICUS_USER")
+        copernicus_password = os.environ.get("COPERNICUS_PASSWORD")
+
+        if not copernicus_user or not copernicus_password:
+            raise ValueError(
+                "Copernicus credentials not found in environment variables.")
+
         # Villarrica coordinates = get coordinates by drawing polygon in
         # Copernicus Browser, copy+paste
         # coordinates in geojson.io, download as .wkt file, open the .wkt file and copy+paste text here
@@ -95,7 +102,8 @@ def query_and_download_products():
                         continue  # Skip if neither L1C nor L2A
 
                     os.makedirs(download_directory, exist_ok=True)
-                    file_path = os.path.join(download_directory, f"{identifier}.zip")
+                    file_path = os.path.join(download_directory,
+                                             f"{identifier}.zip")
 
                     # Save the downloaded file
                     with open(file_path, "wb") as file:

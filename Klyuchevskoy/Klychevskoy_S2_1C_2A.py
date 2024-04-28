@@ -6,12 +6,6 @@ import requests
 import schedule
 import time
 
-# Copernicus User
-copernicus_user = "martin2kelko@gmail.com"
-# Copernicus Password
-copernicus_password = "Nepijemrum22_22"
-
-
 # Copernicus Browser API Token
 def get_keycloak_token(username: str, password: str) -> str:
     data = {
@@ -33,7 +27,7 @@ def get_keycloak_token(username: str, password: str) -> str:
 # Copernicus Browser catalogue and download products
 def query_and_download_products():
     try:
-        # Villarrica coordinates = get coordinates by drawing polygon in
+        # Klyuchevskoy coordinates = get coordinates by drawing polygon in
         # Copernicus Browser, copy+paste
         # coordinates in geojson.io, download as .wkt file, open the .wkt file and copy+paste text here
         ft = "POLYGON ((160.538063 55.996845, 160.538063 56.096173, 160.74749 56.096173, 160.74749 55.996845, 160.538063 55.996845))"
@@ -115,7 +109,7 @@ print("Automatically downloading the Klyuchevskoy images...")
 query_and_download_products()
 print("Automate test complete.")
 
-# Scheduling the script every day at 4:30 AM
+# Scheduling the script every day at 4:26 AM
 # Open Win11 Task Scheduler -> click on "Create Basic Task" -> set the
 # trigger to be "Daily" and specify the time -> choose to start a program and
 # provide the path to your Python executable (python.exe) and the script (

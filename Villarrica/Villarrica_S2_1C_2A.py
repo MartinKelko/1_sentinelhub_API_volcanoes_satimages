@@ -6,12 +6,6 @@ import requests
 import schedule
 import time
 
-# Copernicus User
-copernicus_user = "martin2kelko@gmail.com"
-# Copernicus Password
-copernicus_password = "Nepijemrum22_22"
-
-
 # Copernicus Browser API Token
 def get_keycloak_token(username: str, password: str) -> str:
     data = {
@@ -29,6 +23,7 @@ def get_keycloak_token(username: str, password: str) -> str:
         return response.json()["access_token"]
     except Exception as e:
         raise Exception(f"Keycloak token retrieval failed. Error: {e}")
+
 
 # Copernicus Browser catalogue and download products
 def query_and_download_products():

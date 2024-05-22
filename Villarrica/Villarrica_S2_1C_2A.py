@@ -90,9 +90,9 @@ def query_and_download_products():
 
                     # Determine if Level-1C or Level-2A
                     if "L1C" in product_name:
-                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Villarrica\Sentinel-2L1C_downloads"
+                        download_directory = r"C:\Users\marti\PycharmProjects\1 sentinelhub_API_volcanoes_satimages\Villarrica\Sentinel-2L1C_downloads"
                     elif "L2A" in product_name:
-                        download_directory = r"C:\Users\marti\PycharmProjects\sentinelhub_API_volcanoes_satimages\Villarrica\Sentinel-2L2A_downloads"
+                        download_directory = r"C:\Users\marti\PycharmProjects\1 sentinelhub_API_volcanoes_satimages\Villarrica\Sentinel-2L2A_downloads"
                     else:
                         continue  # Skip if neither L1C nor L2A
 

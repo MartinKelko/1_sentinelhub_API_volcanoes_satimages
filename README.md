@@ -2,6 +2,7 @@
 
 ## Description
 This script is designed for the automated downloading of satellite data from the Copernicus catalog for a selected area. It imports the necessary libraries (os, re, datetime, timedelta, pandas, requests, schedule), handles authentication and authorization to the Copernicus Browser API using a username and password, and executes the script at a scheduled time using the schedule library.
+https://medium.com/@martin2kelko/automating-download-of-sentinel-2-images-for-villarrica-volcano-monitoring-using-python-and-5e29866a34ff
 
 ## How to Use
 To use this code, follow these steps:
